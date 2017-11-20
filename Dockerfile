@@ -32,9 +32,8 @@ COPY supervisord/*.conf /etc/supervisor/conf.d/
 
 
 # Install MySQL
-# FIXME: Set password / user?
-RUN echo 'mysql-server-5.7 mysql-server/root_password_again password root' | debconf-set-selections && \
-    echo 'mysql-server-5.7 mysql-server/root_password password root' | debconf-set-selections && \
+RUN echo 'mysql-server-5.7 mysql-server/root_password_again password defaultrootpwd' | debconf-set-selections && \
+    echo 'mysql-server-5.7 mysql-server/root_password password defaultrootpwd' | debconf-set-selections && \
     apt-get update && apt-get install --yes \
         mysql-server-5.7 && \
     mkdir -p /var/lib/mysql /var/run/mysqld /var/mysqld/ && \
@@ -45,6 +44,7 @@ RUN echo 'mysql-server-5.7 mysql-server/root_password_again password root' | deb
 ENV HHVM_DISABLE_NUMA true
 
 RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0x5a16e7281be7a449 && \
+    apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xB4112585D386EB94 && \
     add-apt-repository "deb http://dl.hhvm.com/ubuntu xenial main" && \
     apt-get update && \
     apt-get install --yes hhvm
