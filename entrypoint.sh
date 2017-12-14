@@ -7,6 +7,11 @@ set -o nounset
 # Supervisord #
 ###############
 
+# Workaround for issue #72 that makes MySQL to fail to
+# start when using docker's overlay2 storage driver:
+#   https://github.com/docker/for-linux/issues/72
+sudo find /var/lib/mysql -type f -exec touch {} \;
+
 supervisord -c /etc/supervisor/supervisord.conf
 
 ###############
@@ -26,6 +31,8 @@ echo ""
 
 if [ "$i" == 0 ]; then
     echo >&2 'FATAL: MySQL failed to start'
+    echo "Showing content of /var/log/mysql/error.log ..."
+    cat /var/log/mysql/error.log || true
     exit 1
 fi
 
@@ -46,5 +53,9 @@ else
 fi
 
 # FIXME: Create standard user and grant permissions
+
+# Clear shell history
+history -c
+history -w
 
 exec "$@"
