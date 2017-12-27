@@ -91,6 +91,8 @@ else
     echo "Akaunting database user already created. Continue ..."
 fi
 
+# Remove credentials file
+rm ~/.my.cnf
 
 # Clear shell
 unset MYSQL_ROOT_PASSWORD

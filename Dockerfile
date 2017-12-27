@@ -2,7 +2,7 @@ FROM ubuntu:16.04
 LABEL mantainer="info@kuralabs.io"
 
 # Options
-ENV AKAUNTING_VERSION 1.0.8
+ENV AKAUNTING_VERSION 1.1.6
 
 
 # -----
