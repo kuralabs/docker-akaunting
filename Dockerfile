@@ -11,49 +11,64 @@ USER root
 ENV DEBIAN_FRONTEND noninteractive
 
 # Set the locale
-RUN apt-get update && \
-    apt-get --yes --no-install-recommends install locales && \
-    locale-gen en_US.UTF-8 && \
-    update-locale LANG=en_US.UTF-8
+RUN apt-get update \
+    && apt-get install --yes --no-install-recommends \
+        locales \
+    && locale-gen en_US.UTF-8 \
+    && update-locale LANG=en_US.UTF-8
 ENV LANG en_US.UTF-8
 
 
 # Install base Software
-RUN apt-get update && apt-get install --yes \
+RUN apt-get update \
+    && apt-get install --yes --no-install-recommends \
         curl unzip \
         software-properties-common \
         apt-transport-https
 
 
 # Install supervisord
-RUN apt-get update && apt-get --yes install \
+RUN apt-get update \
+    && apt-get install --yes --no-install-recommends \
         supervisor dirmngr
 COPY supervisord/*.conf /etc/supervisor/conf.d/
 
 
 # Install MySQL
-RUN echo 'mysql-server-5.7 mysql-server/root_password_again password defaultrootpwd' | debconf-set-selections && \
-    echo 'mysql-server-5.7 mysql-server/root_password password defaultrootpwd' | debconf-set-selections && \
-    apt-get update && apt-get install --yes \
-        mysql-server-5.7 && \
-    mkdir -p /var/lib/mysql /var/run/mysqld /var/mysqld/ && \
-    chown mysql:mysql /var/lib/mysql /var/run/mysqld /var/mysqld/
+RUN echo 'mysql-server-5.7 mysql-server/root_password_again password defaultrootpwd' | debconf-set-selections \
+    && echo 'mysql-server-5.7 mysql-server/root_password password defaultrootpwd' | debconf-set-selections \
+    && apt-get install --yes --no-install-recommends \
+        mysql-server-5.7 \
+    && mkdir -p /var/lib/mysql /var/run/mysqld /var/mysqld/ \
+    && chown mysql:mysql /var/lib/mysql /var/run/mysqld /var/mysqld/
 
 
-# Install HHVM
-ENV HHVM_DISABLE_NUMA true
+# Install NGINX and PHP
+RUN apt-get update \
+    && apt-get install --yes --no-install-recommends \
+        nginx \
+        php7.0-fpm \
+        php7.0-mbstring php7.0-xml php7.0-gd
+#    && rm /etc/nginx/sites-available/default \
 
-RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0x5a16e7281be7a449 && \
-    apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xB4112585D386EB94 && \
-    add-apt-repository "deb http://dl.hhvm.com/ubuntu xenial main" && \
-    apt-get update && \
-    apt-get install --yes hhvm
-ADD proxygen/server.ini /etc/hhvm/server.ini
+# ADD nginx/akaunting /etc/nginx/sites-available/akaunting
+# ADD nginx/nginx.conf /etc/nginx/nginx.conf
+# ADD php/php.ini /etc/php/7.0/fpm/php.ini
 
 
 # Install composer
-RUN mkdir /opt/composer && \
-    curl --silent --show-error https://getcomposer.org/installer | hhvm --php -- --install-dir=/opt/composer
+# Thanks https://getcomposer.org/doc/faqs/how-to-install-composer-programmatically.md
+RUN mkdir /opt/composer \
+    && curl --silent --show-error -o composer-setup.php https://getcomposer.org/installer \
+    && EXPECTED_SIGNATURE=$(curl --silent --show-error https://composer.github.io/installer.sig) \
+    && ACTUAL_SIGNATURE=$(php -r "echo hash_file('SHA384', 'composer-setup.php');") \
+    && if [ "${EXPECTED_SIGNATURE}" != "${ACTUAL_SIGNATURE}" ]; then \
+            >&2 echo 'ERROR: Invalid composer installer signature' \
+            && rm composer-setup.php \
+            && exit 1 \
+       ; fi \
+    && php composer-setup.php --install-dir=/opt/composer \
+    && rm composer-setup.php
 
 
 # Create system user
@@ -81,7 +96,7 @@ RUN curl \
 
 # Install dependencies
 WORKDIR /var/www/akaunting
-RUN hhvm /opt/composer/composer.phar install
+RUN php /opt/composer/composer.phar install
 
 
 # Start supervisord
