@@ -40,6 +40,26 @@ function wait_for_mysql {
     fi
 }
 
+function wait_for_php_fpm {
+
+    echo -n "Waiting for php-fpm "
+    for i in {30..0}; do
+        if [ -S "/run/php/php7.0-fpm.sock" ]; then
+            break
+        fi
+        echo -n "."
+        sleep 1
+    done
+    echo ""
+
+    if [ "$i" == 0 ]; then
+        echo >&2 "FATAL: php-fpm failed to start"
+        echo "Showing content of /var/log/php7.0-fpm.log ..."
+        cat /var/log/php7.0-fpm.log || true
+        exit 1
+    fi
+}
+
 ##################
 # Initialization #
 ##################
