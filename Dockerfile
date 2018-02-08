@@ -48,7 +48,8 @@ RUN apt-get update \
         nginx \
         php7.0-fpm \
         php7.0-mbstring php7.0-xml php7.0-gd \
-    && rm /etc/nginx/sites-available/default
+    && rm -rf /var/lib/apt/lists/* \
+    && rm /etc/nginx/sites-enabled/default
 
 
 # Install composer
@@ -96,6 +97,15 @@ RUN php /opt/composer/composer.phar install
 
 # Install files
 COPY docker/supervisord/*.conf /etc/supervisor/conf.d/
+
+COPY nginx/akaunting /etc/nginx/sites-available/akaunting
+RUN chown www-data:www-data /etc/nginx/sites-available/akaunting \
+    && ln -s /etc/nginx/sites-available/akaunting /etc/nginx/sites-enabled
+
+# Configure PHP Processor
+RUN sed -i 's/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/' /etc/php/7.0/fpm/php.ini
+
+
 # ... If needed
 # COPY php/php.ini /etc/php/7.0/fpm/php.ini
 
