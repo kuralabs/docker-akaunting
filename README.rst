@@ -20,6 +20,10 @@ available at:
 Usage
 =====
 
+Build me with::
+
+    docker build --tag kuralabs/akaunting:latest .
+
 To run the container, execute:
 
 .. code-block:: bash

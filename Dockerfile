@@ -63,7 +63,7 @@ RUN mkdir /opt/composer \
             && rm composer-setup.php \
             && exit 1 \
        ; fi \
-    && php composer-setup.php --install-dir=/opt/composer \
+    && php composer-setup.php --install-dir=/usr/local/bin/ --filename=composer \
     && rm composer-setup.php
 
 
@@ -92,11 +92,11 @@ RUN curl \
 
 # Install dependencies
 WORKDIR /var/www/akaunting
-RUN php /opt/composer/composer.phar install
+RUN composer install
 
 
 # Install files
-COPY docker/supervisord/*.conf /etc/supervisor/conf.d/
+COPY supervisord/*.conf /etc/supervisor/conf.d/
 
 COPY nginx/akaunting /etc/nginx/sites-available/akaunting
 RUN chown www-data:www-data /etc/nginx/sites-available/akaunting \
