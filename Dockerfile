@@ -2,7 +2,7 @@ FROM ubuntu:16.04
 LABEL mantainer="info@kuralabs.io"
 
 # Options
-ENV AKAUNTING_VERSION 1.1.6
+ENV AKAUNTING_VERSION 1.1.10
 
 
 # -----
@@ -10,35 +10,34 @@ ENV AKAUNTING_VERSION 1.1.6
 USER root
 ENV DEBIAN_FRONTEND noninteractive
 
-# Set the locale
-RUN apt-get update \
-    && apt-get install --yes --no-install-recommends \
-        locales \
-    && locale-gen en_US.UTF-8 \
-    && update-locale LANG=en_US.UTF-8
+
+# Setup and install base system software
+RUN echo "locales locales/locales_to_be_generated multiselect en_US.UTF-8 UTF-8" | debconf-set-selections \
+    && echo "locales locales/default_environment_locale select en_US.UTF-8" | debconf-set-selections \
+    && apt-get update \
+    && apt-get --yes --no-install-recommends install \
+        locales tzdata sudo \
+        ca-certificates apt-transport-https software-properties-common \
+        bash-completion iproute2 curl unzip nano tree \
+    && rm -rf /var/lib/apt/lists/*
 ENV LANG en_US.UTF-8
-
-
-# Install base Software
-RUN apt-get update \
-    && apt-get install --yes --no-install-recommends \
-        curl unzip \
-        software-properties-common \
-        apt-transport-https
 
 
 # Install supervisord
 RUN apt-get update \
-    && apt-get install --yes --no-install-recommends \
-        supervisor dirmngr
-COPY supervisord/*.conf /etc/supervisor/conf.d/
+    && apt-get --yes --no-install-recommends install \
+        supervisor dirmngr \
+    && rm -rf /var/lib/apt/lists/*
 
 
 # Install MySQL
-RUN echo 'mysql-server-5.7 mysql-server/root_password_again password defaultrootpwd' | debconf-set-selections \
-    && echo 'mysql-server-5.7 mysql-server/root_password password defaultrootpwd' | debconf-set-selections \
-    && apt-get install --yes --no-install-recommends \
+ENV MYSQL_DEFAULT_PASSWORD uYqBu/41C4Iog4vq9eShKg==
+
+RUN echo "mysql-server-5.7 mysql-server/root_password_again password ${MYSQL_DEFAULT_PASSWORD}" | debconf-set-selections \
+    && echo "mysql-server-5.7 mysql-server/root_password password ${MYSQL_DEFAULT_PASSWORD}" | debconf-set-selections \
+    && apt-get update && apt-get install --yes \
         mysql-server-5.7 \
+    && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /var/lib/mysql /var/run/mysqld /var/mysqld/ \
     && chown mysql:mysql /var/lib/mysql /var/run/mysqld /var/mysqld/
 
@@ -48,12 +47,8 @@ RUN apt-get update \
     && apt-get install --yes --no-install-recommends \
         nginx \
         php7.0-fpm \
-        php7.0-mbstring php7.0-xml php7.0-gd
-#    && rm /etc/nginx/sites-available/default \
-
-# ADD nginx/akaunting /etc/nginx/sites-available/akaunting
-# ADD nginx/nginx.conf /etc/nginx/nginx.conf
-# ADD php/php.ini /etc/php/7.0/fpm/php.ini
+        php7.0-mbstring php7.0-xml php7.0-gd \
+    && rm /etc/nginx/sites-available/default
 
 
 # Install composer
@@ -97,6 +92,12 @@ RUN curl \
 # Install dependencies
 WORKDIR /var/www/akaunting
 RUN php /opt/composer/composer.phar install
+
+
+# Install files
+COPY docker/supervisord/*.conf /etc/supervisor/conf.d/
+# ... If needed
+# COPY php/php.ini /etc/php/7.0/fpm/php.ini
 
 
 # Start supervisord

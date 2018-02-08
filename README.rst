@@ -35,7 +35,7 @@ License
 
 .. code-block:: txt
 
-   Copyright (C) 2017 KuraLabs S.R.L
+   Copyright (C) 2017-2018 KuraLabs S.R.L
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
