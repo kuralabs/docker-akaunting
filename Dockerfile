@@ -47,7 +47,7 @@ RUN apt-get update \
     && apt-get install --yes --no-install-recommends \
         nginx \
         php7.0-fpm \
-        php7.0-mbstring php7.0-xml php7.0-curl php7.0-zip php7.0-gd \
+        php7.0-mbstring php7.0-xml php7.0-curl php7.0-zip php7.0-gd php7.0-mysql \
         composer \
     && rm -rf /var/lib/apt/lists/* \
     && rm /etc/nginx/sites-enabled/default \
