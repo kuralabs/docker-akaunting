@@ -49,13 +49,13 @@ RUN apt-get update \
         php7.0-fpm \
         php7.0-mbstring php7.0-xml php7.0-gd \
     && rm -rf /var/lib/apt/lists/* \
-    && rm /etc/nginx/sites-enabled/default
+    && rm /etc/nginx/sites-enabled/default \
+    && sed -i 's/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/' /etc/php/7.0/fpm/php.ini
 
 
 # Install composer
 # Thanks https://getcomposer.org/doc/faqs/how-to-install-composer-programmatically.md
-RUN mkdir /opt/composer \
-    && curl --silent --show-error -o composer-setup.php https://getcomposer.org/installer \
+RUN curl --silent --show-error -o composer-setup.php https://getcomposer.org/installer \
     && EXPECTED_SIGNATURE=$(curl --silent --show-error https://composer.github.io/installer.sig) \
     && ACTUAL_SIGNATURE=$(php -r "echo hash_file('SHA384', 'composer-setup.php');") \
     && if [ "${EXPECTED_SIGNATURE}" != "${ACTUAL_SIGNATURE}" ]; then \
@@ -96,22 +96,15 @@ RUN composer install
 
 
 # Install files
+USER root
 COPY supervisord/*.conf /etc/supervisor/conf.d/
 
 COPY nginx/akaunting /etc/nginx/sites-available/akaunting
 RUN chown www-data:www-data /etc/nginx/sites-available/akaunting \
     && ln -s /etc/nginx/sites-available/akaunting /etc/nginx/sites-enabled
 
-# Configure PHP Processor
-RUN sed -i 's/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/' /etc/php/7.0/fpm/php.ini
-
-
-# ... If needed
-# COPY php/php.ini /etc/php/7.0/fpm/php.ini
-
 
 # Start supervisord
-USER root
 EXPOSE 8080
 
 COPY entrypoint.sh /usr/local/bin/
