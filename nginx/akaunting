@@ -2,22 +2,18 @@ server {
     listen 8080 default_server;
     listen [::]:8080 default_server;
 
-    root /var/www/akaunting;
-
-    index index.php;
-
     server_name _;
+    root /var/www/akaunting/root;
 
+    # Static files
+    location ~ ^/(public|modules|vendor)/(.*\.(ico|gif|jpg|jpeg|png|js|css|less|sass|font|woff|woff2|eot|ttf|svg))$ {
+        alias /var/www/akaunting/$1/$2;
+    }
+
+    # Front controller
     location / {
-        try_files $uri $uri/ =404;
-    }
-
-    location ~ \.php$ {
-        include snippets/fastcgi-php.conf;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME /var/www/akaunting/index.php;
         fastcgi_pass unix:/run/php/php7.0-fpm.sock;
-    }
-
-    location ~ /\.ht {
-        deny all;
     }
 }
