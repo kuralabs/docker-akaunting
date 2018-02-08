@@ -23,7 +23,7 @@ fi
 function wait_for_mysql {
 
     echo -n "Waiting for MySQL "
-    for i in {30..0}; do
+    for i in {10..0}; do
         if mysqladmin ping > /dev/null 2>&1; then
             break
         fi
@@ -43,7 +43,7 @@ function wait_for_mysql {
 function wait_for_php_fpm {
 
     echo -n "Waiting for php-fpm "
-    for i in {30..0}; do
+    for i in {10..0}; do
         if [ -S "/run/php/php7.0-fpm.sock" ]; then
             break
         fi
@@ -54,8 +54,8 @@ function wait_for_php_fpm {
 
     if [ "$i" == 0 ]; then
         echo >&2 "FATAL: php-fpm failed to start"
-        echo "Showing content of /var/log/php7.0-fpm.log ..."
-        cat /var/log/php7.0-fpm.log || true
+        echo "Showing content of /var/log/supervisor/php-fpm.log ..."
+        cat /var/log/supervisor/php-fpm.log || true
         exit 1
     fi
 }
@@ -90,10 +90,6 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
 
     rm /tmp/mysql-init.sql
 fi
-
-# PHP FPM boot
-mkdir -p /run/php
-chown www-data:www-data /run/php
 
 ##################
 # Supervisord    #

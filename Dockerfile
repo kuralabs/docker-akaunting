@@ -50,7 +50,8 @@ RUN apt-get update \
         php7.0-mbstring php7.0-xml php7.0-gd \
     && rm -rf /var/lib/apt/lists/* \
     && rm /etc/nginx/sites-enabled/default \
-    && sed -i 's/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/' /etc/php/7.0/fpm/php.ini
+    && sed -i 's/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/' /etc/php/7.0/fpm/php.ini \
+    && mkdir /run/php
 
 
 # Install composer
