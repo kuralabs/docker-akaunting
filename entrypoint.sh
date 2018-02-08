@@ -71,6 +71,10 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
     rm /tmp/mysql-init.sql
 fi
 
+# PHP FPM boot
+mkdir -p /run/php
+chown www-data:www-data /run/php
+
 ##################
 # Supervisord    #
 ##################
@@ -82,6 +86,9 @@ supervisord --nodaemon -c /etc/supervisor/supervisord.conf > /dev/null 2>&1 &
 
 # Wait for MySQL to start
 wait_for_mysql
+
+# Wait for PHP FPM to start
+wait_for_php_fpm
 
 ##################
 # MySQL          #

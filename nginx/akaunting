@@ -2,7 +2,7 @@ server {
     listen 8080 default_server;
     listen [::]:8080 default_server;
 
-    root /var/www/akaunting/public;
+    root /var/www/akaunting;
 
     index index.php;
 
