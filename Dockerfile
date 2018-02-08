@@ -69,20 +69,21 @@ RUN curl --silent --show-error -o composer-setup.php https://getcomposer.org/ins
 
 # Install Akaunting
 WORKDIR /tmp/
-RUN curl \
+RUN mkdir /var/www/akaunting/ \
+    && curl \
         --location \
         -o akaunting.zip \
         https://github.com/akaunting/akaunting/archive/${AKAUNTING_VERSION}.zip \
     && unzip akaunting.zip \
     && rm akaunting.zip \
     && find akaunting-*/ -mindepth 1 -maxdepth 1 -exec mv -t /var/www/akaunting/ -- {} + \
-    && rmdir akaunting-* \
-    && chown -R www-data:www-data /var/www/akaunting
+    && rmdir akaunting-*
 
 
 # Install dependencies
 WORKDIR /var/www/akaunting
-RUN composer install
+RUN composer install \
+    && chown -R www-data:www-data /var/www/akaunting
 
 
 # Install files
