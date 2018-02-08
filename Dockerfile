@@ -67,27 +67,17 @@ RUN curl --silent --show-error -o composer-setup.php https://getcomposer.org/ins
     && rm composer-setup.php
 
 
-# Create system user
-RUN adduser \
-        --system \
-        --home /var/www/akaunting \
-        --disabled-password \
-        --group \
-        akaunting
-
-
 # Install Akaunting
-USER akaunting
 WORKDIR /tmp/
 RUN curl \
         --location \
         -o akaunting.zip \
-        https://github.com/akaunting/akaunting/archive/${AKAUNTING_VERSION}.zip && \
-    unzip akaunting.zip && \
-    rm akaunting.zip && \
-    find akaunting-*/ -mindepth 1 -maxdepth 1 -exec mv -t /var/www/akaunting/ -- {} + && \
-    rmdir akaunting-* && \
-    ls -lah /var/www/akaunting
+        https://github.com/akaunting/akaunting/archive/${AKAUNTING_VERSION}.zip \
+    && unzip akaunting.zip \
+    && rm akaunting.zip \
+    && find akaunting-*/ -mindepth 1 -maxdepth 1 -exec mv -t /var/www/akaunting/ -- {} + \
+    && rmdir akaunting-* \
+    && chown -R www-data:www-data /var/www/akaunting
 
 
 # Install dependencies
