@@ -47,30 +47,17 @@ RUN apt-get update \
     && apt-get install --yes --no-install-recommends \
         nginx \
         php7.0-fpm \
-        php7.0-mbstring php7.0-xml php7.0-gd \
+        php7.0-mbstring php7.0-xml php7.0-curl php7.0-zip php7.0-gd \
+        composer \
     && rm -rf /var/lib/apt/lists/* \
     && rm /etc/nginx/sites-enabled/default \
     && sed -i 's/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/' /etc/php/7.0/fpm/php.ini \
     && mkdir /run/php
 
 
-# Install composer
-# Thanks https://getcomposer.org/doc/faqs/how-to-install-composer-programmatically.md
-RUN curl --silent --show-error -o composer-setup.php https://getcomposer.org/installer \
-    && EXPECTED_SIGNATURE=$(curl --silent --show-error https://composer.github.io/installer.sig) \
-    && ACTUAL_SIGNATURE=$(php -r "echo hash_file('SHA384', 'composer-setup.php');") \
-    && if [ "${EXPECTED_SIGNATURE}" != "${ACTUAL_SIGNATURE}" ]; then \
-            >&2 echo 'ERROR: Invalid composer installer signature' \
-            && rm composer-setup.php \
-            && exit 1 \
-       ; fi \
-    && php composer-setup.php --install-dir=/usr/local/bin/ --filename=composer \
-    && rm composer-setup.php
-
-
 # Install Akaunting
 WORKDIR /tmp/
-RUN mkdir /var/www/akaunting/ \
+RUN mkdir -p /var/www/akaunting/root \
     && curl \
         --location \
         -o akaunting.zip \
@@ -78,13 +65,16 @@ RUN mkdir /var/www/akaunting/ \
     && unzip akaunting.zip \
     && rm akaunting.zip \
     && find akaunting-*/ -mindepth 1 -maxdepth 1 -exec mv -t /var/www/akaunting/ -- {} + \
-    && rmdir akaunting-*
+    && rmdir akaunting-* \
+    && chown -R www-data:www-data /var/www/akaunting
 
 
 # Install dependencies
+# NOTE: Change to www-data as composer should never run as root.
+#       See https://getcomposer.org/root
+USER www-data
 WORKDIR /var/www/akaunting
-RUN composer install \
-    && chown -R www-data:www-data /var/www/akaunting
+RUN composer install
 
 
 # Install files
