@@ -145,10 +145,11 @@ else
 fi
 
 # Create standard user and grant permissions
-MYSQL_USER_PASSWORD=$(openssl rand -base64 32)
 
 if ! echo "SELECT COUNT(*) FROM mysql.user WHERE user = 'akaunting';" | mysql | grep 1 &> /dev/null; then
+
     echo "Creating akaunting database user ..."
+    MYSQL_USER_PASSWORD=$(openssl rand -base64 32)
 
     echo "CREATE USER 'akaunting'@'localhost' IDENTIFIED BY '${MYSQL_USER_PASSWORD}';
           GRANT ALL PRIVILEGES ON akaunting.* TO 'akaunting'@'localhost';
@@ -159,15 +160,36 @@ if ! echo "SELECT COUNT(*) FROM mysql.user WHERE user = 'akaunting';" | mysql | 
     echo ""
     echo "${MYSQL_USER_PASSWORD}"
     echo ""
-    echo "Use the above credentials to setup your new Akaunting deployment!"
+    echo "Please securely store these credentials!"
     echo "*****************************************************************"
 
 else
     echo "Akaunting database user already created. Continue ..."
+    MYSQL_USER_PASSWORD=""
 fi
 
-# Remove credentials file
-rm ~/.my.cnf
+##################
+# AKAUNTING      #
+##################
+
+if echo "SELECT COUNT(DISTINCT table_name) FROM information_schema.columns WHERE table_schema = 'akaunting';" | mysql | grep 0 &> /dev/null; then
+    echo "Database is empty, installing Akaunting for the first time ..."
+    sudo -u www-data php artisan app:configure -vvv \
+        --db-host=127.0.0.1 \
+        --db-port=3306 \
+        --db-name=akaunting \
+        --db-username=akaunting \
+        --db-password="${MYSQL_USER_PASSWORD}"
+        # FIXME: Lets make the command interactive for now
+        # --no-interaction \
+        # --company-name="Company Name" \
+        # --company-email="info@company.com" \
+        # --admin-email="info@company.com" \
+        # --admin-password="AwesomeAdminPassword1$" \
+    echo "Akaunting successfully installed ..."
+else
+    echo "TODO: Check if version changed and and execute migrations!!!!"
+fi
 
 ##################
 # NGINX          #
@@ -184,7 +206,9 @@ supervisorctl start nginx
 # Display final status
 supervisorctl status
 
-# Clear shell
+# Security clearing
+rm ~/.my.cnf
+
 unset MYSQL_DEFAULT_PASSWORD
 unset MYSQL_ROOT_PASSWORD
 unset MYSQL_USER_PASSWORD
