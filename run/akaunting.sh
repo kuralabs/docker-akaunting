@@ -18,14 +18,14 @@ docker pull kuralabs/akaunting:latest
 
 # Run the container
 docker run --detach --init \
-   --hostname akaunting \
-   --name akaunting \
-   --restart always \
-   --publish 8080:8080 \
-   --volume /srv/akaunting/mysql:/var/lib/mysql \
-   --volume /srv/akaunting/logs:/var/log \
-   --env MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD}" \
-   --env TZ=America/Costa_Rica \
-   --volume /etc/timezone:/etc/timezone:ro \
-   --volume /etc/localtime:/etc/localtime:ro \
-   kuralabs/akaunting:latest
+    --hostname akaunting \
+    --name akaunting \
+    --restart always \
+    --publish 8080:8080 \
+    --volume /srv/akaunting/mysql:/var/lib/mysql \
+    --volume /srv/akaunting/logs:/var/log \
+    --env MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD}" \
+    --env TZ=America/Costa_Rica \
+    --volume /etc/timezone:/etc/timezone:ro \
+    --volume /etc/localtime:/etc/localtime:ro \
+    kuralabs/akaunting:latest
