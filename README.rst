@@ -17,8 +17,71 @@ available at:
 
     https://hub.docker.com/r/kuralabs/akaunting/
 
+
 Usage
 =====
+
+Adapt the following script to your needs:
+
+.. code-block:: sh
+
+   #!/usr/bin/env bash
+
+   set -o errexit
+   set -o nounset
+
+   # Create mount points
+   sudo mkdir -p /srv/akaunting/mysql
+   sudo mkdir -p /srv/akaunting/logs
+
+   # Stop the running container
+   docker stop akaunting || true
+
+   # Remove existing container
+   docker rm akaunting || true
+
+   # Pull the new image
+   docker pull kuralabs/akaunting:latest
+
+   # Run the container
+   docker run --detach --init \
+       --hostname akaunting \
+       --name akaunting \
+       --restart always \
+       --publish 8080:8080 \
+       --volume /srv/akaunting/mysql:/var/lib/mysql \
+       --volume /srv/akaunting/logs:/var/log \
+       --env MYSQL_ROOT_PASSWORD="[YOUR_AWESOME_MYSQL_ROOT_PASSWORD]" \
+       kuralabs/akaunting:latest
+
+.. note::
+
+   If you need to set the container to the same time zone as your host machine
+   you may use the following options:
+
+   .. code-block::
+
+      --env TZ=America/New_York \
+      --volume /etc/timezone:/etc/timezone:ro \
+      --volume /etc/localtime:/etc/localtime:ro \
+
+   You may use the following website to find your time zone:
+
+   http://timezonedb.com/
+
+Then, open http://localhost:8080/ (or corresponding URL) in your browser and
+finish the installation using the web UI.
+
+You can find the parameters for the "Database Setup" step in your container
+logs:
+
+.. code-block:: sh
+
+   docker logs akaunting
+
+
+Development
+===========
 
 Build me with::
 
@@ -27,10 +90,6 @@ Build me with::
 In development, run me with::
 
     $ MYSQL_ROOT_PASSWORD=[MYSQL SECURE ROOT PASSWORD] ./run/akaunting-dev.sh
-
-In production, run me with::
-
-    $ MYSQL_ROOT_PASSWORD=[MYSQL SECURE ROOT PASSWORD] ./run/akaunting.sh
 
 
 License

@@ -15,4 +15,7 @@ docker run --interactive --tty \
     --volume /srv/akaunting/mysql:/var/lib/mysql \
     --publish 8080:8080 \
     --env MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD}" \
+    --env TZ=America/Costa_Rica \
+    --volume /etc/timezone:/etc/timezone:ro \
+    --volume /etc/localtime:/etc/localtime:ro \
     kuralabs/akaunting:latest bash

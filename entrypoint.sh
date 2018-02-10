@@ -144,51 +144,74 @@ else
     echo "Database already exists. Continue ..."
 fi
 
-# Create standard user and grant permissions
-
-if ! echo "SELECT COUNT(*) FROM mysql.user WHERE user = 'akaunting';" | mysql | grep 1 &> /dev/null; then
-
-    echo "Creating akaunting database user ..."
-    MYSQL_USER_PASSWORD=$(openssl rand -base64 32)
-
-    echo "CREATE USER 'akaunting'@'localhost' IDENTIFIED BY '${MYSQL_USER_PASSWORD}';
-          GRANT ALL PRIVILEGES ON akaunting.* TO 'akaunting'@'localhost';
-          FLUSH PRIVILEGES;" | mysql
-
-    echo "*****************************************************************"
-    echo "IMPORTANT!! USER 'akaunting' CREATED WITH PASSWORD:"
-    echo ""
-    echo "${MYSQL_USER_PASSWORD}"
-    echo ""
-    echo "Please securely store these credentials!"
-    echo "*****************************************************************"
-
-else
-    echo "Akaunting database user already created. Continue ..."
-    MYSQL_USER_PASSWORD=""
-fi
-
 ##################
 # AKAUNTING      #
 ##################
 
 if echo "SELECT COUNT(DISTINCT table_name) FROM information_schema.columns WHERE table_schema = 'akaunting';" | mysql | grep 0 &> /dev/null; then
+
     echo "Database is empty, installing Akaunting for the first time ..."
-    sudo -u www-data php artisan app:configure -vvv \
-        --db-host=127.0.0.1 \
-        --db-port=3306 \
-        --db-name=akaunting \
-        --db-username=akaunting \
-        --db-password="${MYSQL_USER_PASSWORD}"
-        # FIXME: Lets make the command interactive for now
-        # --no-interaction \
-        # --company-name="Company Name" \
-        # --company-email="info@company.com" \
-        # --admin-email="info@company.com" \
-        # --admin-password="AwesomeAdminPassword1$" \
-    echo "Akaunting successfully installed ..."
+
+    # Create standard user and grant permissions
+    MYSQL_USER_PASSWORD=$(openssl rand -base64 32)
+
+    if ! echo "SELECT COUNT(*) FROM mysql.user WHERE user = 'akaunting';" | mysql | grep 1 &> /dev/null; then
+
+        echo "Creating akaunting database user ..."
+
+        echo "CREATE USER 'akaunting'@'localhost' IDENTIFIED BY '${MYSQL_USER_PASSWORD}';
+              GRANT ALL PRIVILEGES ON akaunting.* TO 'akaunting'@'localhost';
+              FLUSH PRIVILEGES;" | mysql
+    else
+        echo "Akaunting not installed but user was created. Resetting password ..."
+
+        echo "ALTER USER 'akaunting'@'localhost' IDENTIFIED BY '${MYSQL_USER_PASSWORD}';
+              FLUSH PRIVILEGES;" | mysql
+    fi
+
+    GREEN='\033[0;32m'
+    NO_COLOR='\033[0m'
+
+    echo -e "${GREEN}"
+    echo "*****************************************************************"
+    echo "IMPORTANT!! GO TO THE WEB INTERFACE TO FINISH INSTALLATION!"
+    echo ""
+    echo "Use the following parameters in 'Database Setup':"
+    echo ""
+    echo "Hostname:     127.0.0.1:3306"
+    echo "Username:     akaunting"
+    echo "Password:     ${MYSQL_USER_PASSWORD}"
+    echo "Database:     akaunting"
+    echo ""
+    echo "Please securely store these credentials!"
+    echo "*****************************************************************"
+    echo -e "${NO_COLOR}"
+
+    # We could use the following command to install Akaunting, but it could
+    # imply:
+    #
+    # - To pass environment variables that only will be use the first time.
+    # - Force to user to run the container interactively the first time.
+    #
+    # Both are ugly. A better approach could be to make Akaunting store the
+    # database credentials and in the web UI just ask for Company Name, Company
+    # email, admin email and admin password only, but this will require support
+    # from the application.
+
+    # sudo -u www-data php artisan app:configure -vvv \
+    #     --db-host=127.0.0.1 \
+    #     --db-port=3306 \
+    #     --db-name=akaunting \
+    #     --db-username=akaunting \
+    #     --db-password="${MYSQL_USER_PASSWORD}" \
+    #     --no-interaction \
+    #     --company-name="Company Name" \
+    #     --company-email="info@company.com" \
+    #     --admin-email="info@company.com" \
+    #     --admin-password="AwesomeAdminPassword1$"
+
 else
-    echo "TODO: Check if version changed and and execute migrations!!!!"
+    echo "Akaunting already installed. Continue ..."
 fi
 
 ##################
