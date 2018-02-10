@@ -13,6 +13,7 @@ docker run --interactive --tty \
     --hostname akaunting \
     --name akaunting \
     --volume /srv/akaunting/mysql:/var/lib/mysql \
+    --volume /srv/akaunting/logs:/var/log \
     --publish 8080:8080 \
     --env MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD}" \
     --env TZ=America/Costa_Rica \

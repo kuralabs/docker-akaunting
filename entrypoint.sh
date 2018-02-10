@@ -16,6 +16,20 @@ if [ -z "${MYSQL_ROOT_PASSWORD_SET}" ]; then
     exit 1
 fi
 
+# Logging
+for i in mysql,mysql nginx,root supervisor,root; do
+
+    IFS=',' read directory owner <<< "${i}"
+
+    if [ ! -d "/var/log/${directory}" ]; then
+        echo "Setting up /var/log/${directory} ..."
+        mkdir -p "/var/log/${directory}"
+        chown "${owner}:adm" "/var/log/${directory}"
+    else
+        echo "Directory /var/log/${directory} already setup ..."
+    fi
+done
+
 ##################
 # Waits          #
 ##################
