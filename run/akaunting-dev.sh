@@ -18,4 +18,4 @@ docker run --interactive --tty \
     --env TZ=America/Costa_Rica \
     --volume /etc/timezone:/etc/timezone:ro \
     --volume /etc/localtime:/etc/localtime:ro \
-    kuralabs/akaunting:latest bash
+    kuralabs/docker-akaunting:latest bash

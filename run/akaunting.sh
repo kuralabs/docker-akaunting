@@ -14,7 +14,7 @@ docker stop akaunting || true
 docker rm akaunting || true
 
 # Pull the new image
-docker pull kuralabs/akaunting:latest
+docker pull kuralabs/docker-akaunting:latest
 
 # Run the container
 docker run --detach --init \
@@ -28,4 +28,4 @@ docker run --detach --init \
     --env TZ=America/Costa_Rica \
     --volume /etc/timezone:/etc/timezone:ro \
     --volume /etc/localtime:/etc/localtime:ro \
-    kuralabs/akaunting:latest
+    kuralabs/docker-akaunting:latest

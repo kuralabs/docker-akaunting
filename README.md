@@ -12,7 +12,7 @@ Akaunting provides an awesome App Store for users and developers.
 This repository holds the source of the all-in-one Akaunting Docker image
 available at:
 
-- https://hub.docker.com/r/kuralabs/akaunting/
+- https://hub.docker.com/r/kuralabs/docker-akaunting/
 
 
 ## Usage
@@ -36,7 +36,7 @@ docker stop akaunting || true
 docker rm akaunting || true
 
 # Pull the new image
-docker pull kuralabs/akaunting:latest
+docker pull kuralabs/docker-akaunting:latest
 
 # Run the container
 docker run --detach --init \
@@ -47,7 +47,7 @@ docker run --detach --init \
     --volume /srv/akaunting/mysql:/var/lib/mysql \
     --volume /srv/akaunting/logs:/var/log \
     --env MYSQL_ROOT_PASSWORD="[YOUR_AWESOME_MYSQL_ROOT_PASSWORD]" \
-    kuralabs/akaunting:latest
+    kuralabs/docker-akaunting:latest
 ```
 
 If you need to set the container to the same time zone as your host machine you
@@ -80,7 +80,7 @@ Development
 Build me with:
 
 ```
-docker build --tag kuralabs/akaunting:latest .
+docker build --tag kuralabs/docker-akaunting:latest .
 ```
 
 In development, run me with:
