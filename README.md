@@ -7,12 +7,12 @@ small businesses and freelancers. It is built with modern technologies such as
 Laravel, Bootstrap, jQuery, RESTful API etc. Thanks to its modular structure,
 Akaunting provides an awesome App Store for users and developers.
 
-    [https://akaunting.com/]
+- https://akaunting.com/
 
 This repository holds the source of the all-in-one Akaunting Docker image
 available at:
 
-    [https://hub.docker.com/r/kuralabs/akaunting/]
+- https://hub.docker.com/r/kuralabs/akaunting/
 
 
 ## Usage
@@ -61,10 +61,10 @@ may use the following options:
 
 You may use the following website to find your time zone:
 
-   [http://timezonedb.com/]
+- http://timezonedb.com/
 
-Then, open [http://localhost:8080/] (or corresponding URL) in your browser and
-finish the installation using the web UI.
+Then, open `http://localhost:8080/` (or corresponding URL) in your browser
+and finish the installation using the web UI.
 
 You can find the parameters for the "Database Setup" step in your container
 logs:
