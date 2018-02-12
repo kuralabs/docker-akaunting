@@ -30,6 +30,14 @@ for i in mysql,mysql nginx,root supervisor,root; do
     fi
 done
 
+# Copy configuration files if new mount
+if find /var/www/akaunting/config -mindepth 1 | read; then
+   echo "Configuration is mounted. Skipping copy ..."
+else
+   echo "First configuration. Copying config files ..."
+   cp -R /var/www/akaunting/config.package/* /var/www/akaunting/config
+fi
+
 ##################
 # Waits          #
 ##################

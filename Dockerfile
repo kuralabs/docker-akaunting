@@ -69,12 +69,14 @@ RUN mkdir -p /var/www/akaunting/root \
     && chown -R www-data:www-data /var/www/akaunting
 
 
-# Install dependencies
+# Install dependencies and config files
 # NOTE: Change to www-data as composer should never run as root.
 #       See https://getcomposer.org/root
 USER www-data
 WORKDIR /var/www/akaunting
-RUN composer install
+RUN composer install \
+    && php artisan vendor:publish --provider="Fideloper\Proxy\TrustedProxyServiceProvider" \
+    && cp -R /var/www/akaunting/config /var/www/akaunting/config.package
 
 
 # Install files
