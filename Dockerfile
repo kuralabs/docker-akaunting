@@ -89,7 +89,7 @@ RUN chown www-data:www-data /etc/nginx/sites-available/akaunting \
 
 
 # Start supervisord
-EXPOSE 8080
+EXPOSE 8080/TCP
 
 COPY entrypoint.sh /usr/local/bin/
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

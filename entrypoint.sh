@@ -36,6 +36,7 @@ if find /var/www/akaunting/config -mindepth 1 | read; then
 else
    echo "First configuration. Copying config files ..."
    cp -R /var/www/akaunting/config.package/* /var/www/akaunting/config
+   chown -R www-data:www-data /var/www/akaunting/config
 fi
 
 ##################
