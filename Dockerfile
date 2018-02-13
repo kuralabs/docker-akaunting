@@ -1,17 +1,11 @@
 FROM ubuntu:16.04
 LABEL mantainer="info@kuralabs.io"
 
-# Options
-ENV AKAUNTING_VERSION 1.1.10
 
-
-# -----
-
+# Setup and install base system software
 USER root
 ENV DEBIAN_FRONTEND noninteractive
 
-
-# Setup and install base system software
 RUN echo "locales locales/locales_to_be_generated multiselect en_US.UTF-8 UTF-8" | debconf-set-selections \
     && echo "locales locales/default_environment_locale select en_US.UTF-8" | debconf-set-selections \
     && apt-get update \
@@ -56,6 +50,8 @@ RUN apt-get update \
 
 
 # Install Akaunting
+ENV AKAUNTING_VERSION 1.1.11
+
 WORKDIR /tmp/
 RUN mkdir -p /var/www/akaunting/root \
     && curl \
