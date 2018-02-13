@@ -76,8 +76,89 @@ docker logs akaunting
 ```
 
 
-Development
-===========
+### Using behind a SSL terminating reverse proxy
+
+A very common use case is to use a container behind a web server configured as
+a reverse proxy and handling the HTTPS connection.
+
+To enable Akaunting to work behind a reverse proxy first configure the trusted
+proxies. From your host (where you mounted the Akaunting configuration files):
+
+```
+sudo nano /srv/akaunting/config/trustedproxy.php
+```
+
+In many cases, and depending on your setup and firewall, the following might be
+sufficient:
+
+```
+/*
+ * Or, to trust all proxies that connect
+ * directly to your server, uncomment this:
+ */
+'proxies' => '*',
+```
+
+#### Apache
+
+Use the following configuration to setup the reverse proxy in Apache for
+Akaunting:
+
+```
+# Reverse proxy
+ProxyPreserveHost On
+ProxyPass / http://0.0.0.0:8080/
+ProxyPassReverse / http://0.0.0.0:8080/
+
+RequestHeader set X-Forwarded-Proto "https"
+RequestHeader set X-Forwarded-Port "443"
+```
+
+
+#### NGINX
+
+The following is just a guess and hasn't been tested, so if you use Nginx
+please confirm if the following configuration works as expected.
+
+```
+location / {
+    proxy_pass http://0.0.0.0:8080/;
+
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For    $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Port   443;
+    proxy_set_header X-Forwarded-Proto  https;
+}
+```
+
+
+### Configuring email to use GSuite - Gmail SMTP
+
+A common setup is to use a Gmail / GSuite account to send emails. To configure
+Akaunting edit mail configuration as follows:
+
+```
+sudo nano /srv/akaunting/config/mail.php
+```
+
+And change keys to:
+
+```
+'driver' => 'smtp',
+'host' => 'smtp.gmail.com',
+'port' => 587,
+'from' => [
+    'address' => 'your.email@your-domain.com',
+    'name' => 'Your Company Name',
+],
+
+'encryption' => 'tls',
+'username' => 'your.email@your-domain.com',
+'password' => 'YOUR_SMTP_PASSWORD',
+```
+
+
+## Development
 
 Build me with:
 
@@ -90,6 +171,7 @@ In development, run me with:
 ```
 MYSQL_ROOT_PASSWORD=[MYSQL SECURE ROOT PASSWORD] ./run/akaunting-dev.sh
 ```
+
 
 ## License
 
