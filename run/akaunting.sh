@@ -6,7 +6,7 @@ set -o nounset
 # Create mount points
 sudo mkdir -p /srv/akaunting/mysql
 sudo mkdir -p /srv/akaunting/logs
-sudo mkdir -p /srv/akaunting/config
+sudo touch /srv/akaunting/.env
 
 # Stop the running container
 docker stop akaunting || true
@@ -25,7 +25,7 @@ docker run --detach --init \
     --publish 8080:8080 \
     --volume /srv/akaunting/mysql:/var/lib/mysql \
     --volume /srv/akaunting/logs:/var/log \
-    --volume /srv/akaunting/config:/var/www/akaunting/config \
+    --volume /srv/akaunting/.env:/var/www/akaunting/.env \
     --env MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD}" \
     --env TZ=America/Costa_Rica \
     --volume /etc/timezone:/etc/timezone:ro \

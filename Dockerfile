@@ -71,8 +71,7 @@ RUN mkdir -p /var/www/akaunting/root \
 USER www-data
 WORKDIR /var/www/akaunting
 RUN composer install \
-    && php artisan vendor:publish --provider="Fideloper\Proxy\TrustedProxyServiceProvider" \
-    && cp -R /var/www/akaunting/config /var/www/akaunting/config.package
+    && php artisan vendor:publish --provider="Fideloper\Proxy\TrustedProxyServiceProvider"
 
 
 # Install files

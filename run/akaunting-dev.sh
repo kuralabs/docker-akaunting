@@ -5,7 +5,7 @@ set -o nounset
 
 sudo mkdir -p /srv/akaunting/mysql
 sudo mkdir -p /srv/akaunting/logs
-sudo mkdir -p /srv/akaunting/config
+sudo touch /srv/akaunting/.env
 
 docker stop akaunting || true
 docker rm akaunting || true
@@ -15,7 +15,7 @@ docker run --interactive --tty \
     --name akaunting \
     --volume /srv/akaunting/mysql:/var/lib/mysql \
     --volume /srv/akaunting/logs:/var/log \
-    --volume /srv/akaunting/config:/var/www/akaunting/config \
+    --volume /srv/akaunting/.env:/var/www/akaunting/.env \
     --publish 8080:8080 \
     --env MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD}" \
     --env TZ=America/Costa_Rica \
