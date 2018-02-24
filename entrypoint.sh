@@ -11,7 +11,7 @@ MYSQL_ROOT_PASSWORD_SET=${MYSQL_ROOT_PASSWORD:-}
 
 if [ -z "${MYSQL_ROOT_PASSWORD_SET}" ]; then
     echo "Please set the MySQL root password:"
-    echo "    docker run -e MYSQL_ROOT_PASSWORD=<mysecret> ... kuralabs/akaunting:latest ..."
+    echo "    docker run -e MYSQL_ROOT_PASSWORD=<mysecret> ... kuralabs/docker-akaunting:latest ..."
     echo "See README.rst for more information on usage."
     exit 1
 fi
@@ -161,7 +161,7 @@ else
 fi
 
 ##################
-# AKAUNTING      #
+# Akaunting      #
 ##################
 
 if echo "SELECT COUNT(DISTINCT table_name) FROM information_schema.columns WHERE table_schema = 'akaunting';" | mysql | grep 0 &> /dev/null; then

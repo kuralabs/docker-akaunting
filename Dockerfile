@@ -83,17 +83,16 @@ RUN mkdir -p /var/www/akaunting/root \
 #       See https://getcomposer.org/root
 USER www-data
 WORKDIR /var/www/akaunting
-RUN composer install \
-    && php artisan vendor:publish --provider="Fideloper\Proxy\TrustedProxyServiceProvider"
+RUN composer install
+COPY akaunting/config/trustedproxy.php config/trustedproxy.php
 
 
 # Install files
 USER root
 COPY supervisord/*.conf /etc/supervisor/conf.d/
 
-COPY nginx/akaunting /etc/nginx/sites-available/akaunting
-RUN chown www-data:www-data /etc/nginx/sites-available/akaunting \
-    && ln -s /etc/nginx/sites-available/akaunting /etc/nginx/sites-enabled
+COPY --chown=www-data:www-data nginx/akaunting /etc/nginx/sites-available/akaunting
+RUN ln -s /etc/nginx/sites-available/akaunting /etc/nginx/sites-enabled
 
 
 # Start supervisord
