@@ -133,6 +133,9 @@ wait_for_php_fpm
 # MySQL          #
 ##################
 
+# force set to be +e so error do NEVER terminate the script and errorhandling can be done here
+set +e
+
 # Check if password was changed
 echo "\
 [client]
