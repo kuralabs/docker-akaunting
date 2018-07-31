@@ -6,7 +6,7 @@ server {
     root /var/www/akaunting/root;
 
     # Static files
-    location ~ ^/(public|modules|vendor)/(.*\.(ico|gif|jpg|jpeg|png|js|css|less|sass|font|woff|woff2|eot|ttf|svg))$ {
+    location ~ ^/(public|modules|vendor)/(.*\.(ico|gif|jpg|jpeg|png|js|css|less|sass|font|woff|woff2|eot|ttf|svg|csv|xls|xlsx))$ {
         alias /var/www/akaunting/$1/$2;
     }
 
